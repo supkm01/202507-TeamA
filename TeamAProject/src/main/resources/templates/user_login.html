@@ -21,7 +21,7 @@
     </header>
     <article>
         <h2>ログイン</h2>
-        <form action="/user/login" method="post">
+        <form th:action="@{/user/login/process}" method="post">
             <table class="user_login_table">
                 <tr>
                     <th id="user_userid">メールアドレス</th>
