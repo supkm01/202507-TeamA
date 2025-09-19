@@ -22,7 +22,7 @@
 	</header>
 	<article>
 		<h2>新規会員登録</h2>
-		<form action="/user/register/process" method="post">
+		<form action="/user/register/process" th:object="${form}" method="post">
 			<div class="register">
 				<table class="register_table">
 					<tr>
