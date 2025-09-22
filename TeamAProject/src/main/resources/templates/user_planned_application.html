@@ -15,12 +15,12 @@
   <header>
         <div th:if="${loginFlg}">
              <h1><img src="/img/logo.png"></h1>
-             <p id="mypage"><a href="/lesson/mypage">マイページ</a></p>
-             <p id="user_register_6" style="color: white;" text="userName"></p>   
+             <p id="mypage"><a th:href="@{/lesson/mypage}">マイページ</a></p>
+             <p id="user_register_6" style="color: white;" th:text="${userName}"></p>   
         </div>
-         <div th:if="${!loginFlg}">
+        <div th:if="${!loginFlg}">
              <h1><img src="/img/logo.png"></h1>
-             <p id="mypage"><a href="/lesson/mypage">マイページ</a></p>   
+             <p id="mypage"><a th:href="@{/lesson/mypage}">マイページ</a></p>   
         </div>
     </header>
    <article>

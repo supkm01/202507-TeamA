@@ -1,8 +1,8 @@
-package project.com.controller;
+package project.com.controllers;
 
 import lombok.RequiredArgsConstructor;
 import project.com.dto.UserRegisterForm;
-import project.com.service.UserRegisterService;
+import project.com.services.UserRegisterService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +20,7 @@ public class UserRegisterController {
 	@Autowired
 	private UserRegisterService userRegisterService;
 
+	
 	// form
 	@ModelAttribute("form")
 	public UserRegisterForm setupForm() {
