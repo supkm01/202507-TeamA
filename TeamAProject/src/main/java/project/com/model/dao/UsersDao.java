@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import project.com.model.entity.Users;
-import java.util.List;
+
 
 
 @Repository
@@ -19,5 +19,5 @@ public interface UsersDao extends JpaRepository<Users, Long> {
 	//userログインする時の検証（メールアドレスとパスワード）
 	//SELECT * FROM Users WHERE users_email = ? AND users_password
 	Users findByUserEmailAndUserPassword(String userEmail, String userPassword);
-	
+
 }

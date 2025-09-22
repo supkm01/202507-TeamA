@@ -40,7 +40,7 @@ public class UserLoginController {
 			return "redirect:/lesson/menu";
 		}
 	}
-
+		
 	// ログアウト処理 (一覧画面機能が完成したら検証する)
 	@GetMapping("/user/logout")
 	public String usersLoginout() {
