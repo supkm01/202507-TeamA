@@ -1,4 +1,4 @@
-package project.com.service;
+package project.com.services;
 
 import lombok.RequiredArgsConstructor;
 import project.com.dto.UserRegisterForm;
@@ -29,6 +29,7 @@ public class UserRegisterService {
 		u.setUserName(form.getUserName());
 		u.setUserEmail(form.getUserEmail());
 //		u.setUserPassword(passwordEncoder.encode(form.getPassword()));
+		u.setUserPassword(form.getPassword());
 		u.setDeleteFlg(0);
 		u.setRegisterDate(LocalDateTime.now());
 		return usersRepository.save(u);

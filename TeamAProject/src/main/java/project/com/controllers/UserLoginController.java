@@ -14,7 +14,9 @@ import project.com.services.UsersService;
 public class UserLoginController {
 	@Autowired
 	private UsersService usersService;
+	
 	// Sessionが使えるように
+	@Autowired
 	private HttpSession session;
 
 	// userログイン画面を表示
@@ -35,7 +37,7 @@ public class UserLoginController {
 			// そうではない場合は、sessionにログイン情報に保存
 			// 講座一覧画面にリダイレクトする /lesson/menu user_menu.html
 			session.setAttribute("loginUsersInfo", users);
-			return "user_menu.html";
+			return "redirect:/lesson/menu";
 		}
 	}
 
