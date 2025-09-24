@@ -5,14 +5,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import project.com.model.dao.AdminDao;
 import project.com.model.dao.LessonDaoForAdmin;
 import project.com.model.entity.Lesson;
 
 @Service
+@RequiredArgsConstructor
 public class AdminLessonService {
-	@Autowired
-	private LessonDaoForAdmin lessonDaoForAdmin;
+//	@Autowired
+//	private LessonDaoForAdmin lessonDaoForAdmin;
+	private final LessonDaoForAdmin lessonDaoForAdmin;
 
 	// lession一覧のチェック
 	// もしadminId==null 戻り値としてnull
@@ -24,4 +27,9 @@ public class AdminLessonService {
 			return lessonDaoForAdmin.findByAdmin_AdminId(adminId);
 		}
 	}
+	public Lesson saveLesson(Lesson lesson) {
+        return lessonDaoForAdmin.save(lesson);
+    }
+
+	
 }
