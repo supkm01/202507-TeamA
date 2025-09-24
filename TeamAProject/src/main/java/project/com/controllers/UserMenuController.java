@@ -23,25 +23,34 @@ public class UserMenuController {
 	@Autowired
 	private HttpSession session;
 	
-	@ModelAttribute
-    public void setHeaderFlags(Model model) {
-        Object loginUser = session.getAttribute("loginUsersInfo");
-        boolean loginFlg = (loginUser != null);
+	// 共通的にModelへログイン情報をセットする
+		@ModelAttribute
+		public void setHeaderFlags(Model model) {
+			// セッションからログインユーザを取得
+			Object loginUser = session.getAttribute("loginUsersInfo");
+			// ログイン状態フラグ（ユーザがnullでなければtrue）
+			boolean loginFlg = (loginUser != null);
 
-        model.addAttribute("loginFlg", loginFlg);
+			// View側で参照できるようにModelへ格納
+			model.addAttribute("loginFlg", loginFlg);
 
-        if (loginFlg) {
-            Users u = (Users) loginUser;
-            model.addAttribute("userName", u.getUserName());
+			if (loginFlg) {
+				// ログイン済みの場合、ユーザ名も渡す
+				Users u = (Users) loginUser;
+				model.addAttribute("userName", u.getUserName());
 
-        } else {
-            model.addAttribute("userName", null);
-        }
-    }
-
+			} else {
+				// 未ログインの場合、ユーザ名はnull
+				model.addAttribute("userName", null);
+			}
+		}
+	
+	// レッスンメニュー画面表示処理
     @GetMapping("/lesson/menu")
     public String showMenu(Model model) {
+    	// 全レッスン一覧をサービスから取得し、Modelに格納
     	model.addAttribute("lessonList", lessonService.listAll());
+		// user_menu.html を表示
         return "user_menu";
     }
 }
