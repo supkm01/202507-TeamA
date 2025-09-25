@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import project.com.model.dao.LessonRepository;
 import project.com.model.entity.Admin;
 import project.com.model.entity.Lesson;
+
 
 import project.com.services.LessonMenuService;
 
@@ -52,5 +54,16 @@ public class LessonMenuServiceImpl implements LessonMenuService {
 	public List<Lesson> findAllById(Iterable<Long> ids) {
 		return lessonRepository.findAllById(ids);
 	}
+	
+	public List<Lesson> findAll() {
+        return lessonRepository.findAll();
+    }
 
+
+    public List<Lesson> searchByKeyword(String q) {
+        if (!StringUtils.hasText(q)) return findAll();
+        String keyword = q.trim();
+        return lessonRepository
+                .findByLessonNameContainingIgnoreCaseOrLessonDetailContainingIgnoreCase(keyword, keyword);
+    }
 }

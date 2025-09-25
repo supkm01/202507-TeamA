@@ -31,6 +31,17 @@
 	</header>
 	<article>
 		<h2>開催講座一覧</h2>
+		<form class="search-bar" action="" method="get" role="search" onsubmit="return true">
+		  <input
+		    type="search"
+		    name="q"
+		    id="lessonSearch"
+		    placeholder="講座名・説明・日付で検索"
+		    aria-label="講座検索"
+		    th:value="${param.q}" />
+		  <button type="submit">検索</button>
+		  <button type="button" id="clearSearch" onclick="document.getElementById('lessonSearch').value=''; filterLessons();">クリア</button>
+		</form>
 		<button class="menu_btn" onclick="location.href='/lesson/show/cart'">申し込み予定講座</button>
 		<ul class="menu">
 			<li th:each="lesson:${lessonList}"><a th:href="@{/lesson/detail/{lessonId}(lessonId=${lesson.lessonId})}">
@@ -56,5 +67,44 @@
 	</article>
 	<footer><small>Copyright &copy; Academy All rights reserved.</small></footer>
 </body>
+<script>
+  // 前端即時フィルタ：タイトル(h3)と説明(#description)と日時(p)を対象
+  const searchInput = document.getElementById('lessonSearch');
+  const clearBtn = document.getElementById('clearSearch');
 
+  function filterLessons() {
+    const q = (searchInput.value || '').trim().toLowerCase();
+    const items = document.querySelectorAll('.menu > li');
+    items.forEach(li => {
+      const title = (li.querySelector('h3')?.textContent || '').toLowerCase();
+      const desc  = (li.querySelector('#description')?.textContent || '').toLowerCase();
+      const time  = (li.querySelector('a > p')?.textContent || '').toLowerCase();
+      const hit = title.includes(q) || desc.includes(q) || time.includes(q);
+      li.style.display = hit ? '' : 'none';
+    });
+  }
+
+  // 入力のたびにフィルタ（300ms デバウンス）
+  let t;
+  searchInput?.addEventListener('input', () => {
+    clearTimeout(t);
+    t = setTimeout(filterLessons, 300);
+  });
+
+
+  document.addEventListener('DOMContentLoaded', filterLessons);
+</script>
+
+<style>
+
+  .search-bar { display:flex; gap:.5rem; align-items:center; margin: 0 0 1rem; }
+  .search-bar input[type="search"] {
+    flex:1; padding:.6rem .8rem; border:1px solid #ddd; border-radius:6px;
+  }
+  .search-bar button {
+    padding:.6rem .9rem; border:none; border-radius:6px; cursor:pointer;
+    background:#2b6cb0; color:#fff;
+  }
+  .search-bar button#clearSearch { background:#718096; }
+</style>
 </html>

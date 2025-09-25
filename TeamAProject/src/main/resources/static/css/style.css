@@ -1324,3 +1324,20 @@ table, tr, th, td {
 
 }
 
+.search-form {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: .5rem 0 1rem;
+}
+.search-form input[type="text"] {
+  min-width: 18rem;
+  padding: .4rem .6rem;
+}
+.search-form input[type="date"] {
+  padding: .3rem .4rem;
+}
+.search-form button {
+  padding: .4rem .8rem;
+}
