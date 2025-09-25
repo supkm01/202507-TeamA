@@ -18,5 +18,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     // search by admin
     List<Lesson> findByAdminOrderByStartDateAscStartTimeAsc(Admin admin);
-
+    
+    List<Lesson> findByLessonNameContainingIgnoreCaseOrLessonDetailContainingIgnoreCase(String q1, String q2);
 }
