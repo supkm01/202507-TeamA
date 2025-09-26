@@ -10,13 +10,14 @@ import project.com.model.entity.Lesson;
 
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
-    // search時間順
-    List<Lesson> findAllByOrderByStartDateAscStartTimeAsc();
+	// search時間順
+	List<Lesson> findAllByOrderByStartDateAscStartTimeAsc();
 
-    // search　after today
-    List<Lesson> findByStartDateGreaterThanEqualOrderByStartDateAscStartTimeAsc(LocalDate from);
+	// search after today
+	List<Lesson> findByStartDateGreaterThanEqualOrderByStartDateAscStartTimeAsc(LocalDate from);
 
-    // search by admin
-    List<Lesson> findByAdminOrderByStartDateAscStartTimeAsc(Admin admin);
+	// search by admin
+	List<Lesson> findByAdminIdOrderByStartDateAscStartTimeAsc(Admin admin);
 
+	List<Lesson> findByLessonNameContainingIgnoreCaseOrLessonDetailContainingIgnoreCase(String q1, String q2);
 }

@@ -40,7 +40,6 @@ public class Lesson {
     @Column(name = "register_date")
     private LocalDateTime registerDate;
 
-    @ManyToOne
-    @JoinColumn(name = "admin_id", foreignKey = @ForeignKey(name = "admin"))
-    private Admin admin;
+    @Column(name = "admin_id")
+    private Long adminId;
 }
