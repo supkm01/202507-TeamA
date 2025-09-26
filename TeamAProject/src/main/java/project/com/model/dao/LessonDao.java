@@ -7,10 +7,11 @@ import project.com.model.entity.Lesson;
 
 @Repository
 public interface LessonDao extends JpaRepository<Lesson, Long> {
-	
-	//LessonIDを使用してDBに検索をかける
+
+	// LessonIDを使用してDBに検索をかける
 	Lesson findByLessonId(Long lessonId);
-	
-	
-	
+
+	// 保存処理と更新処理 insert update
+	Lesson save(Lesson lesson);
+
 }

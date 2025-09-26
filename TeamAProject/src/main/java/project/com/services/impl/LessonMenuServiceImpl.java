@@ -40,7 +40,7 @@ public class LessonMenuServiceImpl implements LessonMenuService {
 	// 指定された管理者が担当するレッスン一覧を開始日・開始時刻の昇順で取得
 	@Override
 	public List<Lesson> listByAdmin(Admin admin) {
-		return lessonRepository.findByAdminOrderByStartDateAscStartTimeAsc(admin);
+		return lessonRepository.findByAdminIdOrderByStartDateAscStartTimeAsc(admin);
 	}
 
 	// レッスンIDで1件を検索（存在しない場合はOptional.emptyを返す）
@@ -60,10 +60,10 @@ public class LessonMenuServiceImpl implements LessonMenuService {
     }
 
 
-    public List<Lesson> searchByKeyword(String q) {
+  public List<Lesson> searchByKeyword(String q) {
         if (!StringUtils.hasText(q)) return findAll();
         String keyword = q.trim();
         return lessonRepository
                 .findByLessonNameContainingIgnoreCaseOrLessonDetailContainingIgnoreCase(keyword, keyword);
-    }
+  }
 }

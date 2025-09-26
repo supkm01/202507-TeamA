@@ -16,7 +16,7 @@ public interface LessonDaoForAdmin extends JpaRepository<Lesson, Long> {
 
 	// SELECT * FROM Lesson WHERE admin_id = ?
 	// 用途：AdminごとのLessonを表示させる
-	List<Lesson> findByAdmin_AdminId(Long adminId);
+	List<Lesson> findByAdminId(Long adminId);
 
 	// SELECT * FROM lesson WHERE lesson_name = ?
 	// 用途：Lessonの登録チェックに使用。

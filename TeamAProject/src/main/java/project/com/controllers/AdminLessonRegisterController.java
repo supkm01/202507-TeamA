@@ -1,7 +1,11 @@
 package project.com.controllers;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,17 +40,29 @@ public class AdminLessonRegisterController {
 	//
 	@PostMapping("/register/create")
 	public String createLesson(@ModelAttribute Lesson lesson,
-			@RequestParam("imageName") MultipartFile file)
+			@RequestParam("imageFile") MultipartFile file)
 			throws IOException {
 
 		// sessionから管理者の情報をもらう
 		Admin admin = (Admin) session.getAttribute("loginAdminInfo");
-		lesson.setAdmin(admin);
+		lesson.setAdminId(admin.getAdminId());
 
 		// fileの保存
 		if (!file.isEmpty() && file != null) {
-			String fileName = file.getOriginalFilename();
-			lesson.setImageName(fileName);
+			String fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-").format(new Date())
+					+ file.getOriginalFilename();
+			try {
+				Files.copy(file.getInputStream(), 
+						Path.of("src/main/resources/static/lesson-image/" + fileName));
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		//file名前の保存
+		lesson.setImageName(fileName);
+			
+		}else {
+			return "admin_register_lesson.html";
 		}
 		// 時間の保存
 		lesson.setRegisterDate(LocalDateTime.now());
