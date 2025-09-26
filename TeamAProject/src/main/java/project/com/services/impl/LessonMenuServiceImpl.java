@@ -60,10 +60,10 @@ public class LessonMenuServiceImpl implements LessonMenuService {
     }
 
 
-    public List<Lesson> searchByKeyword(String q) {
+  public List<Lesson> searchByKeyword(String q) {
         if (!StringUtils.hasText(q)) return findAll();
         String keyword = q.trim();
         return lessonRepository
                 .findByLessonNameContainingIgnoreCaseOrLessonDetailContainingIgnoreCase(keyword, keyword);
-    }
+  }
 }

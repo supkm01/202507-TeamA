@@ -20,7 +20,6 @@ public class UserRegisterController {
 	@Autowired
 	private UserRegisterService userRegisterService;
 
-	
 	// form
 	@ModelAttribute("form")
 	public UserRegisterForm setupForm() {

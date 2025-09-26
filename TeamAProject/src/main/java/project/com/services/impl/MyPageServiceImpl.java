@@ -23,12 +23,14 @@ public class MyPageServiceImpl implements MyPageService {
 	@PersistenceContext
 	private final EntityManager em;
 
+	// 指定ユーザが購入したアイテム一覧を取得（レッスン情報や取引ヘッダも同時に取得）
 	@Override
 	@Transactional(readOnly = true)
 	public List<TransactionItem> getPurchasedItems(Long userId) {
 		return transactionItemRepository.findAllForUserWithLessonAndTx(userId);
 	}
 
+	// 取引IDに紐づくアイテムを削除
 	@Override
 	@Transactional
 	public void deleteByTransactionId(Long transactionId) {
