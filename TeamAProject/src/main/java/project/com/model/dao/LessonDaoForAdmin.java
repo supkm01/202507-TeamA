@@ -28,6 +28,6 @@ public interface LessonDaoForAdmin extends JpaRepository<Lesson, Long> {
 
 	// DLETE FROM lesson WHERE blog_id = ?
 	// 用途：削除 ！！！@Transactional が宣言必要です
-	void deleteByLessonId(Long LessonId);
+	void deleteByLessonId(Long lessonId);
 	
 }

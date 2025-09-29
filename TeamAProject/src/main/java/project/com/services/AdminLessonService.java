@@ -15,6 +15,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import project.com.model.dao.LessonDaoForAdmin;
 import project.com.model.entity.Lesson;
@@ -107,5 +108,21 @@ public class AdminLessonService {
 		lessonDaoForAdmin.save(lesson);
 
 	}
-
+	//list表示
+	public List<Lesson> findAll(){
+		return lessonDaoForAdmin.findAll();
+	}
+	
+	//Lesson削除
+	@Transactional
+	public boolean deleteLesson(Long lessonId) {
+		if(lessonId == null) {
+			return false;
+		}else {
+			lessonDaoForAdmin.deleteByLessonId(lessonId);
+			return true;
+		}
+	}
+	
+	
 }

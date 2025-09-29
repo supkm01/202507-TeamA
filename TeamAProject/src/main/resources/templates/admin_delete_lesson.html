@@ -36,10 +36,10 @@
 				<th>価格</th>
 			</tr>
 			<tr th:each="lesson:${lessonList}">
-				<td text="lesson.lessonId"></td>
-				<td text="${#temporals.format(lesson.startDate, 'yyyy/MM/dd')}"></td>
-				<td text="lesson.lessonName"></td>
-				<td text="lesson.lessonFee"></td>
+				<td th:text="${lesson.lessonId}"></td>
+				<td th:text="${#temporals.format(lesson.startDate, 'yyyy/MM/dd')}"></td>
+				<td th:text="${lesson.lessonName}"></td>
+				<td th:text="${lesson.lessonFee}"></td>
 			</tr>
 		</table>
 		<div class="change-button">
