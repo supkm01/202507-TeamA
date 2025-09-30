@@ -34,18 +34,24 @@
                         <th>メールアドレス</th>
                         <td>
                             <input type="text" th:field="*{adminEmail}" />
+							<div th:if="${#fields.hasErrors('adminEmail')}" 
+							th:errors="*{adminEmail}" class="error"></div>
                         </td>
                     </tr>
                     <tr>
                         <th>パスワード</th>
                         <td>
                             <input type="text" th:field="*{adminPassword}" />
+							<div th:if="${#fields.hasErrors('adminPassword')}" 
+							 th:errors="*{adminPassword}" class="error"></div>
                         </td>
                     </tr>
                     <tr>
                         <th>パスワード(確認用)</th>
                         <td>
                             <input type="text" th:field="*{confirmPassword}" />
+							<div th:if="${#fields.hasErrors('confirmPassword')}" 
+							 th:errors="*{confirmPassword}" class="error"></div>
                         </td>
                     </tr>
                 </table>

@@ -39,11 +39,15 @@ public class AdminRegsiterController {
                             BindingResult br,
                             Model model) {
 
-//         确认密码校验
+        //パスワードが一致かどうかを確認する
         if (!form.getAdminPassword().equals(form.getConfirmPassword())) {
             br.rejectValue("confirmPassword", "Mismatch", "パスワードが一致しません。");
         }
-
+        //email既に登録されるかどうかを確認する
+        if (adminService.existsByEmail(form.getAdminEmail())) {
+            br.rejectValue("adminEmail", "Duplicate", "このメールアドレスは既に登録されています。");
+        }
+        
         if (br.hasErrors()) {
             return "admin_register.html"; // 
         }

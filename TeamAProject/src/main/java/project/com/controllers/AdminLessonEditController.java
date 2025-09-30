@@ -55,9 +55,16 @@ public class AdminLessonEditController {
 	}
 
 	@PostMapping("/edit/update")
-	public String lessonUpdate(@RequestParam Long lessonId, @RequestParam String lessonName,
-			@RequestParam String lessonDetail, @RequestParam String startDate, @RequestParam String startTime,
-			@RequestParam String finishTime, @RequestParam String lessonFee, @RequestParam String imageName) {
+	public String lessonUpdate(
+			@RequestParam Long lessonId, 
+			@RequestParam String lessonName,
+			@RequestParam String lessonDetail, 
+			@RequestParam String startDate, 
+			@RequestParam String startTime,
+			@RequestParam String finishTime, 
+			@RequestParam String lessonFee, 
+			@RequestParam String imageName,
+			Model model) {
 		// セッションからログインしている管理者情報を取得
 		Admin admin = (Admin) session.getAttribute("loginAdminInfo");
 		if (admin == null) {
@@ -68,8 +75,10 @@ public class AdminLessonEditController {
 			boolean result = adminLessonService.lessonUpdate(lessonId, lessonName, startDate, startTime, finishTime,
 					lessonDetail, lessonFee, imageName);
 			if (result) {
-				// 成功したら講座一覧へリダイレクト
-				return "redirect:/admin/lesson/all";
+				//遷移画面がLessonIdが必要
+				model.addAttribute("lessonId", lessonId);
+				// 成功したら遷移画面へ
+				return "admin_fix_edit.html";
 			} else {
 				// 失敗したら再び編集画面へ
 				return "redirect:/admin/lesson/edit/" + lessonId;
