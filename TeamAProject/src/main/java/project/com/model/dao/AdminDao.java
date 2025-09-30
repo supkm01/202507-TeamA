@@ -18,5 +18,6 @@ public interface AdminDao extends JpaRepository<Admin, Long> {
 	// 用途：ログイン処理に使用。入力したメールアドレスとパスワードが一致してるときだけ データを取る
 	Admin findByAdminEmailAndAdminPassword(String adminEmail, String adminPassword);
 	
-
+	//用途：email確認用
+	boolean existsByAdminEmail(String adminEmail);
 }

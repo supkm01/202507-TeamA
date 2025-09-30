@@ -39,5 +39,10 @@ public class AdminService {
 			return account;
 		}
 	}
+	
+	//email確認
+	public boolean existsByEmail(String email) {
+	    return adminDao.existsByAdminEmail(email);
+	}
 
 }

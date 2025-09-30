@@ -69,7 +69,7 @@ public class AdminLessonRegisterController {
 		// DBに保存する
 		adminLessonService.saveLesson(lesson);
 		//成功したら、前のページに戻る
-		return "redirect:/admin/lesson/all"; // 保存成功后跳转课程列表
+		return "admin_fix_register.html"; // 保存成功后跳转课程列表
 
 	}
 
