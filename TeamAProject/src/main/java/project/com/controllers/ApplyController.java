@@ -78,47 +78,51 @@ public class ApplyController {
 
 	// 確認画面
 	@PostMapping("/lesson/confirm")
-	public String postConfirm(@RequestParam(value = "payment", required = false) Integer payment,
-	                          Model model,
-	                          RedirectAttributes ra) {
-	    // ログインチェック
-	    Users user = (Users) session.getAttribute("loginUsersInfo");
-	    if (user == null) {
-	        ra.addFlashAttribute("error", "ログインが必要です。");
-	        return "redirect:/user/login";
+	public String postConfirm(@RequestParam(value = "payment", required = false) Integer payment, Model model,
+			RedirectAttributes ra) {
+		// ログインチェック
+		Users user = (Users) session.getAttribute("loginUsersInfo");
+		if (user == null) {
+			ra.addFlashAttribute("error", "ログインが必要です。");
+			return "redirect:/user/login";
+		}
+
+		// カートチェック
+		Map<Long, Integer> items = getCartItems();
+		if (items == null || items.isEmpty()) {
+			ra.addFlashAttribute("error", "カートに商品がありません。");
+			return "redirect:/lesson/request";
+		}
+
+		// 支払い方法チェック
+		if (payment == null) {
+			ra.addFlashAttribute("error", "お支払い方法を選択してください。");
+			return "redirect:/lesson/request";
+		}
+
+		// 支払い方法をセッションに格納
+		session.setAttribute("APPLY_PAYMENT", payment);
+
+		// 表示用データ
+		List<Lesson> lessons = lessonService.findAllById(items.keySet());
+		long total = lessons.stream()
+				.mapToLong(l -> (long) l.getLessonFee() * Math.max(1, items.getOrDefault(l.getLessonId(), 1))).sum();
+
+		String payMethod = switch (payment) {
+		case 0 -> "当日現金支払い";
+		case 1 -> "事前銀行振込";
+		case 2 -> "クレジットカード決済";
+		default -> "未選択";
+		};
+		boolean payFlg = (payment == 2); // true=カード用UI, false=非カード用UI
+		
+		// 非クレカなら complete で入庫させるためのフラグとトークンをセット 
+	    if (payment != null && payment != 2) {
+	        session.setAttribute("NEEDS_PERSIST", true);
+	        session.setAttribute("APPLY_TOKEN", java.util.UUID.randomUUID().toString());
 	    }
 
-	    // カートチェック
-	    Map<Long, Integer> items = getCartItems();
-	    if (items == null || items.isEmpty()) {
-	        ra.addFlashAttribute("error", "カートに商品がありません。");
-	        return "redirect:/lesson/request";
-	    }
-
-	    // 支払い方法チェック
-	    if (payment == null) {
-	        ra.addFlashAttribute("error", "お支払い方法を選択してください。");
-	        return "redirect:/lesson/request";
-	    }
-
-	    // 支払い方法をセッションに格納
-	    session.setAttribute("APPLY_PAYMENT", payment);
-
-	    // 表示用データ
-	    List<Lesson> lessons = lessonService.findAllById(items.keySet());
-	    long total = lessons.stream()
-	            .mapToLong(l -> (long) l.getLessonFee() * Math.max(1, items.getOrDefault(l.getLessonId(), 1)))
-	            .sum();
-
-	    String payMethod = switch (payment) {
-	        case 0 -> "当日現金支払い";
-	        case 1 -> "事前銀行振込";
-	        case 2 -> "クレジットカード決済";
-	        default -> "未選択";
-	    };
-	    boolean payFlg = (payment == 2); // true=カード用UI, false=非カード用UI
-
-	    // 非クレカ入庫
+		// 非クレカ入庫
 //	    boolean persisted = false;
 //	    if (!payFlg) {
 //	        try {
@@ -140,20 +144,59 @@ public class ApplyController {
 //	        }
 //	    }
 
-	    // 画面用属性
-	    model.addAttribute("list", lessons);
-	    model.addAttribute("total", total);        // 表示用（DB合計ではない）
-	    model.addAttribute("payment", payment);
-	    model.addAttribute("payMethod", payMethod);
-	    model.addAttribute("payFlg", payFlg);      // true: クレカ用画面, false: 非クレカ用画面
+		// 画面用属性
+		model.addAttribute("list", lessons);
+		model.addAttribute("total", total); // 表示用（DB合計ではない）
+		model.addAttribute("payment", payment);
+		model.addAttribute("payMethod", payMethod);
+		model.addAttribute("payFlg", payFlg); // true: クレカ用画面, false: 非クレカ用画面
 //	    model.addAttribute("persisted", persisted);// 非クレカで既に入庫済みなら true	  
-	    model.addAttribute("persisted", false); //上の一行目を変換	    
-	    model.addAttribute("amount", total);
+		model.addAttribute("persisted", false); // 上の一行目を変換
+		model.addAttribute("amount", total);
 
-	    // 確認ページを返す
-	    return "user_confirm_apply_detail";
+		// 確認ページを返す
+		return "user_confirm_apply_detail";
 	}
 
+	@PostMapping("/lesson/pay")
+	public String pay(RedirectAttributes ra) {
+		Users user = (Users) session.getAttribute("loginUsersInfo");
+		if (user == null) {
+			ra.addFlashAttribute("error", "ログインが必要です。");
+			return "redirect:/user/login";
+		}
+
+		Map<Long, Integer> items = getCartItems(); 
+		if (items == null || items.isEmpty()) {
+			ra.addFlashAttribute("error", "カートに商品がありません。");
+			return "redirect:/lesson/request";
+		}
+
+		Integer payment = (Integer) session.getAttribute("APPLY_PAYMENT");
+		if (payment == null || payment != 2) {
+			ra.addFlashAttribute("error", "お支払い方法が不正です。");
+			return "redirect:/lesson/request";
+		}
+
+		// lesson別に分けて、データを入力
+		for (Map.Entry<Long, Integer> e : items.entrySet()) {
+			Long lessonId = e.getKey();
+			int qty = Math.max(1, e.getValue());
+			for (int i = 0; i < qty; i++) {
+				Long txId = transactionHistoryService.record(user, lessonId);
+				transactionItemService.insertItem(txId, lessonId);
+			}
+		}
+
+		// 入庫後、カート系セッションを掃除
+		session.removeAttribute("CART_ITEMS");
+		session.removeAttribute("APPLY_PAYMENT");
+
+		ra.addFlashAttribute("message", "お支払いが完了しました。");
+		return "redirect:/lesson/complete";
+	}
+
+//	// 新たな支払い画面
 //	@PostMapping("/lesson/pay")
 //	public String pay(RedirectAttributes ra) {
 //		Users user = (Users) session.getAttribute("loginUsersInfo");
@@ -162,19 +205,19 @@ public class ApplyController {
 //			return "redirect:/user/login";
 //		}
 //
-//		Map<Long, Integer> items = getCartItems(); 
+//		Map<Long, Integer> items = getCartItems();
 //		if (items == null || items.isEmpty()) {
 //			ra.addFlashAttribute("error", "カートに商品がありません。");
 //			return "redirect:/lesson/request";
 //		}
 //
 //		Integer payment = (Integer) session.getAttribute("APPLY_PAYMENT");
-//		if (payment == null || payment != 2) {
+//		if (payment == null) {
 //			ra.addFlashAttribute("error", "お支払い方法が不正です。");
 //			return "redirect:/lesson/request";
 //		}
 //
-//		// lesson別に分けて、データを入力
+//		/* 全支払い方法共通で落库 */
 //		for (Map.Entry<Long, Integer> e : items.entrySet()) {
 //			Long lessonId = e.getKey();
 //			int qty = Math.max(1, e.getValue());
@@ -184,59 +227,59 @@ public class ApplyController {
 //			}
 //		}
 //
-//		// 入庫後、カート系セッションを掃除
+//		/* セッションの掃除 */
 //		session.removeAttribute("CART_ITEMS");
 //		session.removeAttribute("APPLY_PAYMENT");
 //
-//		ra.addFlashAttribute("message", "お支払いが完了しました。");
+//		ra.addFlashAttribute("message", "お申込みが完了しました。");
 //		return "redirect:/lesson/complete";
 //	}
-	
-	//新たな支払い画面
-	@PostMapping("/lesson/pay")
-	public String pay(RedirectAttributes ra) {
-	    Users user = (Users) session.getAttribute("loginUsersInfo");
-	    if (user == null) {
-	        ra.addFlashAttribute("error", "ログインが必要です。");
-	        return "redirect:/user/login";
-	    }
-
-	    Map<Long, Integer> items = getCartItems();
-	    if (items == null || items.isEmpty()) {
-	        ra.addFlashAttribute("error", "カートに商品がありません。");
-	        return "redirect:/lesson/request";
-	    }
-
-	    Integer payment = (Integer) session.getAttribute("APPLY_PAYMENT");
-	    if (payment == null) {
-	        ra.addFlashAttribute("error", "お支払い方法が不正です。");
-	        return "redirect:/lesson/request";
-	    }
-
-	    /* 全支払い方法共通で落库 */
-	    for (Map.Entry<Long, Integer> e : items.entrySet()) {
-	        Long lessonId = e.getKey();
-	        int qty = Math.max(1, e.getValue());
-	        for (int i = 0; i < qty; i++) {
-	            Long txId = transactionHistoryService.record(user, lessonId);
-	            transactionItemService.insertItem(txId, lessonId);
-	        }
-	    }
-
-	    /* セッションの掃除 */
-	    session.removeAttribute("CART_ITEMS");
-	    session.removeAttribute("APPLY_PAYMENT");
-
-	    ra.addFlashAttribute("message", "お申込みが完了しました。");
-	    return "redirect:/lesson/complete";
-	}
-	
-	
-	
 
 	@GetMapping("/lesson/complete")
-	public String completePage(Model model) {
+	public String completePage(Model model, RedirectAttributes ra) {
+		Users user = (Users) session.getAttribute("loginUsersInfo");
+		if (user == null) {
+			ra.addFlashAttribute("error", "ログインが必要です。");
+			return "redirect:/user/login";
+		}
 
+		// 「入庫が必要かどうか」のフラグを取得
+		Boolean needsPersist = (Boolean) session.getAttribute("NEEDS_PERSIST");
+		String token = (String) session.getAttribute("APPLY_TOKEN");
+
+		if (Boolean.TRUE.equals(needsPersist) && token != null) {
+			// すでに処理したトークンを保持しておくことで二重登録を防ぐ
+			@SuppressWarnings("unchecked")
+			java.util.Set<String> processed = (java.util.Set<String>) session.getAttribute("PROCESSED_TOKENS");
+			if (processed == null) {
+				processed = new java.util.HashSet<>();
+				session.setAttribute("PROCESSED_TOKENS", processed);
+			}
+
+			// トークンが未処理であれば入庫処理を実行
+			if (!processed.contains(token)) {
+				Map<Long, Integer> items = getCartItems();
+				if (items != null && !items.isEmpty()) {
+					for (Map.Entry<Long, Integer> e : items.entrySet()) {
+						Long lessonId = e.getKey();
+						int qty = Math.max(1, e.getValue());
+						for (int i = 0; i < qty; i++) {
+							Long txId = transactionHistoryService.record(user, lessonId); // 取引履歴を登録
+							transactionItemService.insertItem(txId, lessonId); // 明細を登録
+						}
+					}
+				}
+				processed.add(token);
+
+				// セッションを掃除（カート情報・支払方法・フラグをクリア）
+				session.removeAttribute("CART_ITEMS");
+				session.removeAttribute("APPLY_PAYMENT");
+				session.removeAttribute("NEEDS_PERSIST");
+				session.removeAttribute("APPLY_TOKEN");
+			}
+		}
+
+		// 完了画面を表示する
 		return "user_apply_complete";
 	}
 }
