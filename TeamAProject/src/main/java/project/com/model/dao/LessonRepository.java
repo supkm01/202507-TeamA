@@ -2,8 +2,11 @@ package project.com.model.dao;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import project.com.model.entity.Admin;
 import project.com.model.entity.Lesson;
@@ -20,4 +23,5 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 	List<Lesson> findByAdminIdOrderByStartDateAscStartTimeAsc(Admin admin);
 
 	List<Lesson> findByLessonNameContainingIgnoreCaseOrLessonDetailContainingIgnoreCase(String q1, String q2);
+
 }

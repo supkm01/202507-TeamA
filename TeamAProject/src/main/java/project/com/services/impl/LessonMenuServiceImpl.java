@@ -11,12 +11,12 @@ import project.com.model.dao.LessonRepository;
 import project.com.model.entity.Admin;
 import project.com.model.entity.Lesson;
 
-
 import project.com.services.LessonMenuService;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -54,16 +54,17 @@ public class LessonMenuServiceImpl implements LessonMenuService {
 	public List<Lesson> findAllById(Iterable<Long> ids) {
 		return lessonRepository.findAllById(ids);
 	}
-	
+
 	public List<Lesson> findAll() {
-        return lessonRepository.findAll();
-    }
+		return lessonRepository.findAll();
+	}
 
+	public List<Lesson> searchByKeyword(String q) {
+		if (!StringUtils.hasText(q))
+			return findAll();
+		String keyword = q.trim();
+		return lessonRepository.findByLessonNameContainingIgnoreCaseOrLessonDetailContainingIgnoreCase(keyword,
+				keyword);
+	}
 
-  public List<Lesson> searchByKeyword(String q) {
-        if (!StringUtils.hasText(q)) return findAll();
-        String keyword = q.trim();
-        return lessonRepository
-                .findByLessonNameContainingIgnoreCaseOrLessonDetailContainingIgnoreCase(keyword, keyword);
-  }
 }

@@ -34,9 +34,14 @@ public class MyPageServiceImpl implements MyPageService {
 	@Override
 	@Transactional
 	public void deleteByTransactionId(Long transactionId) {
-		if (transactionId == null)
-			throw new IllegalArgumentException("transactionIdが不正です。");
-		em.createNativeQuery("DELETE FROM public.transaction_item WHERE transaction_id = :txId")
-				.setParameter("txId", transactionId).executeUpdate();
+		 if (transactionId == null) throw new IllegalArgumentException("transactionIdが不正です。");
+	        em.createNativeQuery("DELETE FROM public.transaction_item WHERE transaction_id = :txId")
+	          .setParameter("txId", transactionId)
+	          .executeUpdate();
+	        em.flush(); 
+	        em.createNativeQuery("DELETE FROM public.transaction_history WHERE transaction_id = :txId")
+	          .setParameter("txId", transactionId)
+	          .executeUpdate();	    
 	}
+	
 }

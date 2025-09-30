@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import project.com.model.dao.LessonRepository;
 import project.com.model.dao.TransactionHistoryRepository;
+import project.com.model.dao.TransactionItemRepository;
 import project.com.model.entity.Lesson;
 import project.com.model.entity.TransactionHistory;
 import project.com.model.entity.Users;
@@ -25,6 +26,8 @@ public class TransactionHistoryServiceImpl implements TransactionHistoryService 
 	private final TransactionHistoryRepository txRepo;
 	@Autowired
 	private final LessonRepository lessonRepo;
+	@Autowired
+	private final TransactionItemRepository itemRepo;
 
 	// 取引履歴を新規登録（ユーザーが講座を購入した際に呼ばれる）
 	@Override
@@ -60,16 +63,15 @@ public class TransactionHistoryServiceImpl implements TransactionHistoryService 
 	@Override
 	@Transactional
 	public void deleteHeaderForUser(Long transactionId, Long userId) {
-		if (transactionId == null || userId == null)
-			// 引数チェック
-			throw new IllegalArgumentException("削除対象またはユーザーが不正です。");
-		// 該当ユーザーが対象取引を所有しているか確認
-		boolean owned = txRepo.existsByTransactionIdAndUser_UserId(transactionId, userId);
-		if (!owned) {
-			// 見つからない場合、または他人の取引なら削除不可
-			throw new IllegalStateException("対象の取引が見つからないか、権限がありません。");
-		}
-		// 取引ヘッダを削除
-		txRepo.deleteById(transactionId);
+		 if (transactionId == null || userId == null)
+	            throw new IllegalArgumentException("削除対象またはユーザーが不正です。");
+
+	        boolean owned = txRepo.existsByTransactionIdAndUser_UserId(transactionId, userId);
+	        if (!owned) throw new IllegalStateException("対象の取引が見つからないか、権限がありません。");
+
+
+	        int n = itemRepo.deleteByTransactionId(transactionId); 
+
+	        txRepo.deleteById(transactionId);
 	}
 }

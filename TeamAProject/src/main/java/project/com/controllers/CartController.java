@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project.com.model.entity.Lesson;
 import project.com.model.entity.Users;
 import project.com.services.LessonMenuService;
+import project.com.services.PurchaseQueryService;
 
 import java.util.*;
 
@@ -25,23 +26,24 @@ public class CartController {
 	@Autowired
 	private LessonMenuService lessonService;
 
-	
+	@Autowired
+	private PurchaseQueryService purchaseQueryService;
+
 	@ModelAttribute
-    public void setHeaderFlags(Model model) {
-        Object loginUser = session.getAttribute("loginUsersInfo");
-        boolean loginFlg = (loginUser != null);
+	public void setHeaderFlags(Model model) {
+		Object loginUser = session.getAttribute("loginUsersInfo");
+		boolean loginFlg = (loginUser != null);
 
-        model.addAttribute("loginFlg", loginFlg);
+		model.addAttribute("loginFlg", loginFlg);
 
-        if (loginFlg) {
-            Users u = (Users) loginUser;
-            model.addAttribute("userName", u.getUserName());
+		if (loginFlg) {
+			Users u = (Users) loginUser;
+			model.addAttribute("userName", u.getUserName());
 
-        } else {
-            model.addAttribute("userName", null);
-        }
-    }
-	
+		} else {
+			model.addAttribute("userName", null);
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	private Map<Long, Integer> getCartItems() {
@@ -70,22 +72,27 @@ public class CartController {
 
 	// cartに追加
 	@PostMapping("/cart/all")
-    public String addToCart(@RequestParam("lessonId") Long lessonId,
-                            @RequestParam(value = "qty", defaultValue = "1") int qty,
-                            RedirectAttributes ra) {
-        //登録判断
-        Object login = session.getAttribute("loginUsersInfo");
-        if (login == null) return "redirect:/user/login";
+	public String addToCart(@RequestParam("lessonId") Long lessonId,
+			@RequestParam(value = "qty", defaultValue = "1") int qty, RedirectAttributes ra) {
+		// 登録判断
+		Object login = session.getAttribute("loginUsersInfo");
+		if (login == null)
+			return "redirect:/user/login";
 
-        Map<Long, Integer> items = getCartItems();
-        items.merge(lessonId, Math.max(1, qty), Integer::sum);
+		Users user = (Users) login;
+		if (purchaseQueryService.isPurchased(user.getUserId(), lessonId)) {
+			// ra.addFlashAttribute("error", "この商品は既に購入済みのため、再度購入できません。");
+			return "redirect:/lesson/menu";
+		}
+
+		Map<Long, Integer> items = getCartItems();
+		items.merge(lessonId, Math.max(1, qty), Integer::sum);
 
 //        ra.addFlashAttribute("message", "カートに追加しました。");
 
-        return "redirect:/lesson/menu";
+		return "redirect:/lesson/menu";
 
-    }
-
+	}
 
 	// 削除
 	@GetMapping("/cart/delete/{lessonId}")
