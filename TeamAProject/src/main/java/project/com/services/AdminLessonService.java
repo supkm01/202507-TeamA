@@ -124,5 +124,8 @@ public class AdminLessonService {
 		}
 	}
 	
-	
+	//検索機能
+	public List<Lesson> searchLessonByKeyword(Long adminId, String keyword) {
+	    return lessonDaoForAdmin.findByAdminIdAndLessonNameContaining(adminId, keyword);
+	}
 }

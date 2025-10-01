@@ -48,7 +48,11 @@ public class AdminLessonEditController {
 				return "redirect:/admin/login";
 			} else {
 				model.addAttribute("lesson", lesson);
-				return "admin_edit_lesson.html";
+				
+				// 管理者の情報をｈｔｍｌで表示する用
+	            model.addAttribute("loginAdmin", admin);
+				
+	            return "admin_edit_lesson.html";
 			}
 
 		}
