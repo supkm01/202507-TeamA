@@ -20,6 +20,14 @@
    </header>
    <article>
        <h2>講座一覧</h2>
+	   
+	   <!-- 🔍 検索フォーム -->
+	   <form th:action="@{/Admin/search}" method="get" style="margin-bottom: 15px;">
+		<input type="text" name="keyword"
+		           placeholder="講座名で検索"
+		           style="border: 2px solid #2E7D32; border-radius: 4px; padding: 8px 12px; width: 260px; font-size: 16px;">
+	       <button type="submit" style="background-color: #4CAF50; color: white; padding: 5px 10px;">検索</button>
+	   </form>
        <div class="lineup_btn">
            <button onclick="location.href='/admin/lesson/register'">講座追加</button>
            <button onclick="location.href='/admin/lesson/delete'">講座削除</button>

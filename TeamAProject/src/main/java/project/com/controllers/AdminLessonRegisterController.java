@@ -34,6 +34,11 @@ public class AdminLessonRegisterController {
 	@GetMapping("/register")
 	public String showRegisterForm(Model model) {
 		model.addAttribute("lesson", new Lesson());
+		// sessionから管理者の情報をもらう
+		Admin admin = (Admin) session.getAttribute("loginAdminInfo");
+		// 管理者の情報をｈｔｍｌで表示する用
+        model.addAttribute("loginAdmin", admin);
+		
 		return "admin_register_lesson.html";
 	}
 
