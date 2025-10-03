@@ -1,6 +1,9 @@
 package project.com.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 import project.com.model.entity.Lesson;
 import project.com.model.entity.Users;
+import project.com.services.FavoriteService; // ★ 追加
 import project.com.services.LessonMenuService;
 import project.com.services.UserRegisterService;
 import project.com.services.impl.LessonMenuServiceImpl;
@@ -29,44 +33,79 @@ public class UserMenuController {
 	private LessonMenuServiceImpl lessonMenuServiceimpl;
 
 	@Autowired
+	private FavoriteService favoriteService; // ★ 追加
+
+	@Autowired
 	private HttpSession session;
 
 	// 共通的にModelへログイン情報をセットする
 	@ModelAttribute
 	public void setHeaderFlags(Model model) {
-		// セッションからログインユーザを取得
 		Object loginUser = session.getAttribute("loginUsersInfo");
-		// ログイン状態フラグ（ユーザがnullでなければtrue）
 		boolean loginFlg = (loginUser != null);
-
-		// View側で参照できるようにModelへ格納
 		model.addAttribute("loginFlg", loginFlg);
 
 		if (loginFlg) {
-			// ログイン済みの場合、ユーザ名も渡す
 			Users u = (Users) loginUser;
 			model.addAttribute("userName", u.getUserName());
-
 		} else {
-			// 未ログインの場合、ユーザ名はnull
 			model.addAttribute("userName", null);
 		}
 	}
 
-	// レッスンメニュー画面表示処理
+	// レッスンメニュー画面表示処理（開催予定一覧）
 	@GetMapping("/lesson/menu")
 	public String showMenu(Model model) {
-		// 今の時間より以降のレッスン一覧をサービスから取得し、Modelに格納
-		model.addAttribute("lessonList", lessonService.listUpcoming());
-		// user_menu.html を表示
+		List<Lesson> lessonList = lessonService.listUpcoming();
+		model.addAttribute("lessonList", lessonList);
+
+		Users user = (Users) session.getAttribute("loginUsersInfo");
+		enrichFavorites(model, lessonList, user);
+
 		return "user_menu";
 	}
 
+	// キーワード検索付き一覧
 	@GetMapping("/lesson")
 	public String list(@RequestParam(value = "q", required = false) String q, Model model) {
 		List<Lesson> lessonList = (q == null || q.isBlank()) ? lessonService.listUpcoming()
 				: lessonMenuServiceimpl.searchByKeyword(q);
+
 		model.addAttribute("lessonList", lessonList);
+
+		Users user = (Users) session.getAttribute("loginUsersInfo");
+		enrichFavorites(model, lessonList, user);
+
+		model.addAttribute("q", q);
 		return "user_menu";
+	}
+
+	private void enrichFavorites(Model model, List<Lesson> lessons, Users user) {
+		Map<Long, Boolean> favoriteMap = new HashMap<>();
+		Map<Long, Long> favoriteCounts = new HashMap<>();
+
+		if (lessons == null || lessons.isEmpty()) {
+			model.addAttribute("favoriteMap", favoriteMap);
+			model.addAttribute("favoriteCounts", favoriteCounts);
+			return;
+		}
+
+		for (Lesson l : lessons) {
+			if (l == null || l.getLessonId() == null)
+				continue;
+			Long lessonId = l.getLessonId();
+
+			// 1) 各講座のお気に入り数
+			favoriteCounts.put(lessonId, favoriteService.countByLesson(lessonId));
+
+			// 2) ログイン中のみ「自分が付けているか」
+			if (user != null && user.getUserId() != null) {
+				boolean favored = favoriteService.isFavorited(user.getUserId(), lessonId);
+				favoriteMap.put(lessonId, favored);
+			}
+		}
+
+		model.addAttribute("favoriteMap", favoriteMap);
+		model.addAttribute("favoriteCounts", favoriteCounts);
 	}
 }
