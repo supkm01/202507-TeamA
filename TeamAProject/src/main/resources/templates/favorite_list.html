@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>お気に入り</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .fav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .card{border:1px solid #eee;border-radius:10px;overflow:hidden;padding:12px}
+    .card img{width:100%;height:160px;object-fit:cover;border-radius:8px}
+  </style>
+</head>
+<body>
+	<header>
+	  <div>
+	    <h1 class="page-title">お気に入り講座</h1>
+	    <p><a th:href="@{/lesson/mypage}">マイページ</a> / <a th:href="@{/lesson/show/cart}">カート</a></p>
+	  </div>
+	</header>
+
+  <section class="fav-grid">
+    <div class="card" th:each="l : ${favLessons}">
+      <a th:href="@{/lesson/detail/{id}(id=${l.lessonId})}">
+        <img th:src="@{/lesson-image/{items}(items=${l.imageName})}" alt="">
+        <h3 th:text="${l.lessonName}"></h3>
+        <p th:text="${#temporals.format(l.startDate, 'yyyy/MM/dd')} + ' ' + ${#temporals.format(l.startTime,'HH:mm')} + '〜' + ${#temporals.format(l.finishTime,'HH:mm')}"></p>
+      </a>
+    </div>
+  </section>
+</body>
+<style>
+	header .page-title {
+	  float: left;            /* 右側のパンくずと横並びに */
+	  width: auto;
+	  height: 48px;
+	  line-height: 48px;
+	  font-size: 22px;
+	  color: #fff;
+	  margin: 0;
+	}
+
+	/* パンくずのリンク色（ヘッダー背景 #163867 と統一） */
+	header p a {
+	  color: #fff;
+	  text-decoration: underline;
+	}
+	header p a:hover {
+	  opacity: .85;
+	}
+
+	/* コンテンツ枠：既存デザインの862pxセンター + 下余白 */
+	.fav-grid {
+	  width: 862px;
+	  margin: 40px auto 140px;
+	  display: grid;
+	  grid-template-columns: repeat(3, 1fr);
+	  gap: 18px;
+	}
+
+	/* カード */
+	.fav-grid .card {
+	  background: #fff;
+	  border: 4px solid #fff;         /* テーブルと同じ白枠の厚み */
+	  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+	  border-radius: 10px;
+	  overflow: hidden;
+	  transition: transform .15s ease, box-shadow .15s ease;
+	}
+	.fav-grid .card:hover {
+	  transform: translateY(-2px);
+	  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+	}
+
+	/* クリック領域をブロック化 */
+	.fav-grid .card > a {
+	  display: block;
+	  color: #222;
+	  text-decoration: none;
+	}
+
+	/* 画像：サイズ揃え */
+	.fav-grid .card img {
+	  width: 100%;
+	  height: 160px;
+	  object-fit: cover;
+	  background: #93D8F8;            /* 読み込み前のプレースホルダ色 */
+	  display: block;
+	}
+
+	/* タイトル & 開催日時 */
+	.fav-grid .card h3 {
+	  font-size: 18px;
+	  font-weight: 700;
+	  margin: 12px 12px 4px;
+	  line-height: 1.4;
+	}
+	.fav-grid .card p {
+	  font-size: 14px;
+	  margin: 0 12px 14px;
+	  color: #555;
+	}
+
+	/* 画像上にリボン（任意：例 “お気に入り”）を載せたい時に使える */
+	.fav-grid .card .ribbon {
+	  position: absolute;
+	  top: 10px;
+	  left: -6px;
+	  background: #F59923;
+	  color: #fff;
+	  font-size: 12px;
+	  padding: 4px 10px;
+	  border-radius: 0 12px 12px 0;
+	}
+
+	/* 空状態（favLessonsが空のときに使うエリア用） */
+	.fav-empty {
+	  width: 862px;
+	  margin: 60px auto 160px;
+	  text-align: center;
+	  background: #D8F0FC;
+	  border: 4px solid #fff;
+	  border-radius: 12px;
+	  padding: 28px 20px;
+	}
+	.fav-empty p {
+	  font-size: 16px;
+	  margin-bottom: 16px;
+	}
+	.fav-empty a,
+	.fav-empty .btn {
+	  display: inline-block;
+	  background: #F59923;
+	  color: #fff;
+	  border-radius: 21px;
+	  height: 42px;
+	  line-height: 42px;
+	  padding: 0 18px;
+	  font-size: 16px;
+	}
+	.fav-empty a:hover,
+	.fav-empty .btn:hover {
+	  opacity: .9;
+	}
+
+	/* レスポンシブ（862pxの2列→1列） */
+	@media (max-width: 980px) {
+	  .fav-grid {
+	    width: calc(100% - 32px);
+	    grid-template-columns: repeat(2, 1fr);
+	    gap: 16px;
+	  }
+	}
+	@media (max-width: 640px) {
+	  .fav-grid {
+	    grid-template-columns: 1fr;
+	    gap: 14px;
+	  }
+	  header .page-title {
+	    font-size: 20px;
+	  }
+	}
+
+	/* ヘッダー高さを超えないように（既存h1スタイルの影響ガード） */
+	@media (max-width: 420px) {
+	  header .page-title {
+	    line-height: 1.2;
+	    height: auto;
+	    padding: 8px 0;
+	  }
+	}
+</style>
+</html>
