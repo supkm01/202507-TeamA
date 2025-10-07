@@ -67,6 +67,7 @@ public class AdminLessonService {
 			lesson.setStartDate(LocalDate.parse(startDate));
 			lesson.setStartTime(LocalTime.parse(startTime));
 			lesson.setFinishTime(LocalTime.parse(finishTime));
+			lesson.setLessonDetail(lessonDetail);
 			lesson.setLessonFee(Integer.parseInt(lessonFee));
 			lesson.setImageName(imageName);
 
