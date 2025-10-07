@@ -1,5 +1,4 @@
 # 202507_TeamA
-# BlogProject
 <p align="center">
   <img src="https://img.shields.io/badge/-Java-007396.svg?logo=java&style=for-the-badge">
   <img src="https://img.shields.io/badge/-SpringBoot-6DB33F.svg?logo=springboot&style=for-the-badge&logoColor=white">
@@ -27,7 +26,9 @@
 
 ## 🧩 プロジェクト概要
 
-Spring Bootを使用して開発した個人用ブログアプリです。ユーザーはログインして記事を投稿・編集・削除・検索もできます。
+Spring Bootを使用して開発した商品の販売管理システムです。
+管理者が商品の登録・編集・削除・検索もできます。
+ユーザーは商品の購入・ができます。
 
 ---
 
@@ -46,23 +47,24 @@ Spring Bootを使用して開発した個人用ブログアプリです。ユー
 > スクリーンショットを `images/` フォルダに追加し、以下に貼り付けてください
 
 - ログイン画面
-![login](images/login.png)
-<img width="1078" height="684" alt="login" src="https://github.com/user-attachments/assets/bc00bbef-9c6d-4e9a-aed9-128bf030c168" />
-- 記事一覧画面
-<img width="1888" height="932" alt="微信图片_20250901103036_9" src="https://github.com/user-attachments/assets/dc800592-75d4-4759-9b99-812964f61f85" />
-- 記事投稿フォーム
-<img width="1480" height="887" alt="微信图片_20250901103303_10" src="https://github.com/user-attachments/assets/63e47279-1007-4e2a-8db0-1dd5682d630f" />
-- 記事編集フォーム
-<img width="1480" height="887" alt="微信图片_20250901103303_10" src="https://github.com/user-attachments/assets/128b0c14-54ba-480a-865f-5703796b1e92" />
-
+<img width="715" height="461" alt="e8ff7d48a7a5060a2fcbfba7e04e880e" src="https://github.com/user-attachments/assets/d68f7d31-f8ba-46a7-b3fd-b95e01feb232" />
+- Lesson一覧画面
+<img width="731" height="483" alt="2b7f5942a127de57d5ee537388b2a3bf" src="https://github.com/user-attachments/assets/31d8928b-bf39-499e-ab0c-0d98734a3f4b" />
+- Lesson追加フォーム
+<img width="680" height="587" alt="59ff95049043b952cb1a467cd2307254" src="https://github.com/user-attachments/assets/c252781a-c2ab-4190-9f45-dbbb94a9126a" />
+- Lesson編集フォーム
+<img width="610" height="834" alt="8347661eaccc59760d9cd0c59c02abd0" src="https://github.com/user-attachments/assets/45a76dec-6c46-40fd-9d74-8ace63afaadd" />
+- Lesson削除フォーム
+<img width="657" height="319" alt="97eb7fbe89e3ad1e3eddeab7efbda93d" src="https://github.com/user-attachments/assets/529ad51a-ed01-4a86-8621-06443457b13a" />
 
 ---
 
 ## 🧭 ユースケース図
 
-- ユーザー登録・ログイン・ログアウト
-- 投稿作成・編集・削除
-<img width="521" height="540" alt="image" src="https://github.com/user-attachments/assets/981a9312-43b7-4358-bc77-e90cffd1349e" />
+- 管理者登録・ログイン・ログアウト
+- Lesson作成・編集・削除
+<img width="783" height="480" alt="73fd535111dd0e488a04a0a72dac2476" src="https://github.com/user-attachments/assets/aec14e5f-3775-4c51-b04a-054e58012fbe" />
+
 
 
 
@@ -71,36 +73,56 @@ Spring Bootを使用して開発した個人用ブログアプリです。ユー
 ## 🗃 テーブル設計
 
 ```sql
---accountテーブル
-account_id    BIGINT PRIMARY KEY,
-account_name  VARCHAR(255) NOT NULL,
-account_email VARCHAR(255) NOT NULL UNIQUE,
-password      VARCHAR(255) NOT NULL
+--adminテーブル
+CREATE TABLE IF NOT EXISTS public.admin
+(
+admin_id BIGINT GENERATED ALWAYS AS IDENTITY,
+admin_name character varying COLLATE pg_catalog."default",
+admin_email character varying COLLATE pg_catalog."default",
+admin_password character varying COLLATE pg_catalog."default",
+delete_flg integer,
+register_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+CONSTRAINT admin_pkey PRIMARY KEY (admin_id)
+)
+TABLESPACE pg_default;
 
--- blogテーブル
-blog_id       BIGINT PRIMARY KEY,
-blog_title    VARCHAR(255) NOT NULL,
-category_name VARCHAR(255) NOT NULL,
-blog_image    VARCHAR(255) NOT NULL,
-article       TEXT NOT NULL,
-account_id    BIGINT NOT NULL,
-CONSTRAINT    fk_account
-FOREIGN KEY   (account_id)
-REFERENCES    account(account_id)
-
-
+ALTER TABLE IF EXISTS public.admin
+OWNER TO postgres;
 ```
 
+
+```sql
+--Lessonテーブル
+CREATE TABLE IF NOT EXISTS public.lesson
+(
+lesson_id BIGINT GENERATED ALWAYS AS IDENTITY,
+start_date date,
+start_time time without time zone,
+finish_time time without time zone,
+lesson_name character varying COLLATE pg_catalog."default",
+lesson_detail character varying COLLATE pg_catalog."default",
+lesson_fee integer,
+image_name character varying COLLATE pg_catalog."default",
+register_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+admin_id bigint,
+CONSTRAINT lesson_pkey PRIMARY KEY (lesson_id),
+CONSTRAINT admin FOREIGN KEY (admin_id)
+REFERENCES public.admin (admin_id) MATCH SIMPLE
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
+NOT VALID
+);
+
+```
 ## 🌐 URL設計
 
-- `/account/register`：ユーザー登録画面（GET, POST）
-- `/account/login`：ログイン画面（GET, POST）
+- `/admin/register`：管理者登録画面（GET, POST）
+- `/admin/login`：管理者ログイン画面（GET, POST）
+- `//admin/logout`：管理者ログアウト画面（GET, POST）
 - `/account/logout`：ログアウト処理（GET）
-- `/blog/hp`：記事一覧（GET）
-- `/blog/register`：投稿フォーム（GET, POST）
-- `/blog/edit/{blogId}`：記事編集（GET, POST）
-- `/blog/delete`：記事削除（POST）
-- `/blog/search`：記事検索（GET）
+- `/admin/lesson/register`：講座情報登録画面（GET, POST）
+- `/admin/lesson/image/edit/{lessonId}`：講座画像情報編集画面（GET, POST）
+- `/admin/lesson/delete`：講座削除画面（GET, POST）
 
 ---
 
@@ -121,17 +143,7 @@ src/
 
 ## 💡 工夫した点
 
-- 共通レイアウトのテンプレート化（ヘッダー／フッター）
-- ページネーション対応
-
----
-
-## 🧪 今後の課題
-
-- 投稿記事へコメント機能
-- 通報・ブロック機能の導入
-- テストコードの充実（JUnit / MockMvc）
-- Herokuなどへのデプロイ
+- バックエンドとフロントエンドのデータ送り
 
 ---
 
