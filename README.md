@@ -149,7 +149,6 @@ src/
 
 ## 👤 作成者情報
 
-- 氏名：オウ　シゴウ
-- GitHub：[@wzh614401137](https://github.com/wzh614401137)
+- 氏名：王 志豪、邵旻豪、冉旻雯
 
 <p align="right">(<a href="#top">トップへ</a>)</p>
