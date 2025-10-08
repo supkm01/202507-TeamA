@@ -123,25 +123,25 @@ NOT VALID
 - `/admin/lesson/register`：講座情報登録画面（GET, POST）
 - `/admin/lesson/image/edit/{lessonId}`：講座画像情報編集画面（GET, POST）
 - `/admin/lesson/delete`：講座削除画面（GET, POST）
-- `/user/register ユーザー登録画面
-- `/user/confirm ユーザー登録確認機能
-- `/user/register/process ユーザー登録機能
-- `/user/login ユーザーログイン画面
-- `/user/login/process ユーザーログイン機能
-- `/user/logout ユーザーログアウト
-- `/lesson/menu 商品一覧画面
-- `/lesson/detail/{lessonId} 商品詳細画面
-- `/lesson/show/cart カート一覧機能
-- `/lesson/cart/all カート登録機能
-- `/lesson/cart/delete/{lessonId} カート削除機能
-- `/lesson/request 申し込み手続き機能(お支払い方法選択)
-- `/lesson/confirm 申し込み手続き機能(申し込み内容確認)
-- `/lesson/complete 申し込み手続き機能(申し込み完了)
-- `/lesson/mypage 購入履歴機能
-- `/lesson/menu/logout ログアウト機能
-- `/user/password/reset パスワードリセット画面
-- `/user/change/password/complete パスワードリ変更機能
-- 
+- `/user/register`：ユーザー登録画面
+- `/user/confirm`：ユーザー登録確認機能
+- `/user/register/process`：ユーザー登録機能
+- `/user/login`：ユーザーログイン画面
+- `/user/login/process`：ユーザーログイン機能
+- `/user/logout`：ユーザーログアウト
+- `/lesson/menu`：商品一覧画面
+- `/lesson/detail/{lessonId}`：商品詳細画面
+- `/lesson/show/cart`：カート一覧機能
+- `/lesson/cart/all`：カート登録機能
+- `/lesson/cart/delete/{lessonId}`：カート削除機能
+- `/lesson/request`：申し込み手続き機能(お支払い方法選択)
+- `/lesson/confirm`：申し込み手続き機能(申し込み内容確認)
+- `/lesson/complete`：申し込み手続き機能(申し込み完了)
+- `/lesson/mypage`：購入履歴機能
+- `/lesson/menu/logout`：ログアウト機能
+- `/user/password/reset`：パスワードリセット画面
+- `/user/change/password/complete`：パスワードリ変更機能
+
 ---
 
 ## 📂 ディレクトリ構成
